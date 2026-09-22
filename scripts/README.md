@@ -12,7 +12,10 @@ workflows, database migrations, evaluation suites, and local operations.
   indexes an explicitly scoped repository.
 - `bun run eval:project-rag` evaluates Project RAG against configured local
   services.
-- `bun run rag:start` and `bun run rag:stop` manage the local Compose stack.
+- `bun run rag:init` creates the shared ignored configuration, starts the
+  local database, and applies migrations.
+- `bun run rag:start`, `bun run rag:stop`, and `bun run rag:status` manage the
+  same isolated Compose stack.
 - `./bin/ragctl` provides short-lived JSON reads.
 
 For user workflows, see [Using Docs RAG](../docs/guides/using-docs-rag.md),

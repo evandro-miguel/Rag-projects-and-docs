@@ -58,7 +58,7 @@ describe('Project RAG preparation runtime readiness', () => {
     });
   });
 
-  it('rejects known official database and embedding ownership in an isolated lane', async () => {
+  it('rejects known official database ownership in an isolated lane', async () => {
     await expect(
       ensureProjectRagRuntimeReady({
         env: {

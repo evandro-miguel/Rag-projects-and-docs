@@ -1,7 +1,7 @@
 # Docker-first, worktree-local RAG operations stack.
 #
 # This file intentionally has no credential defaults. `scripts/rag-ops.sh init`
-# creates the ignored .env.rag.local file and chooses a disposable database
+# creates the ignored .env.local file and chooses a disposable database
 # identity accepted by the migration runner.
 
 name: ${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}

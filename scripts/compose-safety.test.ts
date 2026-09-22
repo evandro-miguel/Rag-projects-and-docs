@@ -3,11 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const repoRoot = fileURLToPath(new URL('../', import.meta.url));
-const compose = readFileSync(`${repoRoot}infra/docker/compose.yml`, 'utf8');
-const devCompose = readFileSync(`${repoRoot}infra/docker/compose.dev.yml`, 'utf8');
 const localCompose = readFileSync(`${repoRoot}infra/docker/compose.local.yml`, 'utf8');
 const docsCompose = readFileSync(`${repoRoot}infra/docs-rag/compose.yml`, 'utf8');
 const gitignore = readFileSync(`${repoRoot}.gitignore`, 'utf8');
+const ragOps = readFileSync(`${repoRoot}scripts/rag-ops.sh`, 'utf8');
+const packageJson = JSON.parse(readFileSync(`${repoRoot}package.json`, 'utf8')) as {
+  scripts: Record<string, string>;
+};
 
 function publishedPortMappings(source: string): string[] {
   const mappings: string[] = [];
@@ -33,11 +35,6 @@ function publishedPortMappings(source: string): string[] {
 }
 
 describe('release safety boundaries', () => {
-  it('requires an explicit stable Postgres password', () => {
-    expect(compose).toContain('POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?');
-    expect(compose).not.toContain('POSTGRES_PASSWORD:-postgres');
-  });
-
   it('fails closed for the Docs RAG Postgres password and stays loopback-only', () => {
     expect(docsCompose).toContain(
       `POSTGRES_PASSWORD: \${DOCS_RAG_POSTGRES_PASSWORD:?DOCS_RAG_POSTGRES_PASSWORD is required}`
@@ -47,18 +44,15 @@ describe('release safety boundaries', () => {
   });
 
   it('requires explicit database credentials in every Compose lane', () => {
-    for (const source of [compose, devCompose, localCompose, docsCompose]) {
+    for (const source of [localCompose, docsCompose]) {
       expect(source).toMatch(/POSTGRES_PASSWORD:\s+\$\{[^}]+:\?/u);
       expect(source).not.toMatch(/POSTGRES_PASSWORD:\s+\$\{[^}]+:-/u);
     }
   });
 
-  it('keeps development and local published ports loopback-only', () => {
-    const mappings = [...publishedPortMappings(devCompose), ...publishedPortMappings(localCompose)];
+  it('keeps local published ports loopback-only', () => {
+    const mappings = publishedPortMappings(localCompose);
 
-    expect(publishedPortMappings(devCompose)).toEqual([
-      `127.0.0.1:\${RAG_DEV_POSTGRES_PORT:-5441}:5432`,
-    ]);
     expect(publishedPortMappings(localCompose)).toEqual([
       `127.0.0.1:\${RAG_LOCAL_POSTGRES_PORT:-5560}:5432`,
       `127.0.0.1:\${RAG_LOCAL_RERANKER_PORT:-3560}:3456`,
@@ -66,11 +60,7 @@ describe('release safety boundaries', () => {
     expect(mappings.every((mapping) => mapping.startsWith('127.0.0.1:'))).toBe(true);
   });
 
-  it('isolates development and local Compose project identities', () => {
-    expect(devCompose).toContain(`name: \${COMPOSE_PROJECT_NAME:-rag-v2-dev}`);
-    expect(devCompose).toContain(
-      `container_name: \${COMPOSE_PROJECT_NAME:-rag-v2-dev}-postgres-dev`
-    );
+  it('isolates the local Compose project identity', () => {
     expect(localCompose).toContain(`name: \${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}`);
     expect(localCompose).toContain(
       `container_name: \${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}-postgres`
@@ -78,7 +68,6 @@ describe('release safety boundaries', () => {
     expect(localCompose).toContain(
       `container_name: \${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}-reranker`
     );
-    expect(devCompose).not.toContain('name: rag-v2');
     expect(localCompose).not.toMatch(/^\s*container_name:\s*rag-v2(?:\s|$)/mu);
   });
 
@@ -99,9 +88,25 @@ describe('release safety boundaries', () => {
   });
 
   it('covers the generated local environment file with an ignore rule', () => {
-    expect('.env.rag.local').toMatch(/^\.env\..+\.local$/u);
-    expect(gitignore).toMatch(/(^|\n)\/\.env\.\*\.local(?:\n|$)/u);
-    expect(gitignore).not.toMatch(/^\s*!.*\.env\.rag\.local\s*$/mu);
+    expect(gitignore).toMatch(/(^|\n)\.env\.\*(?:\n|$)/u);
+    expect(gitignore).not.toMatch(/^\s*!.*\.env\.local\s*$/mu);
+  });
+
+  it('uses one public lifecycle and shares its configuration with CLI and MCP', () => {
+    expect(packageJson.scripts['rag:init']).toBe('bash scripts/rag-ops.sh init');
+    expect(packageJson.scripts['rag:start']).toBe('bash scripts/rag-ops.sh up');
+    expect(packageJson.scripts['rag:stop']).toBe('bash scripts/rag-ops.sh down');
+    expect(packageJson.scripts['rag:status']).toBe('bash scripts/rag-ops.sh status');
+    expect(packageJson.scripts['rag:doctor']).toBe('bash scripts/rag-ops.sh doctor');
+    expect(ragOps).toContain(
+      ['ENV_FILE="', '$', '{RAG_LOCAL_ENV_FILE:-$PROJECT_ROOT/.env.local}"'].join('')
+    );
+    expect(ragOps).toContain("printf 'PROJECT_RAG_PREPARE_RUNTIME=isolated_dev\\n'");
+    expect(ragOps).toContain(
+      "printf 'PROJECT_RAG_DATABASE_START_COMMAND=bash scripts/rag-ops.sh up\\n'"
+    );
+    expect(ragOps).toContain("embedding_start_command='bun run embeddings:gpu:1024'");
+    expect(ragOps).toContain("embedding_start_command='bun run embeddings:gpu'");
   });
 
   it('keeps generated runtime state operator-local', () => {

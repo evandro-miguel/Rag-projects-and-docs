@@ -2,14 +2,14 @@
 # Docker-first local operations for an isolated RAG Postgres database.
 #
 # The script deliberately owns only the worktree-local compose file and
-# .env.rag.local. It never reads or changes the official RAG configuration.
+# .env.local. The CLI and MCP runtime load that same ignored file.
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$PROJECT_ROOT/infra/docker/compose.local.yml"
-ENV_FILE="${RAG_LOCAL_ENV_FILE:-$PROJECT_ROOT/.env.rag.local}"
+ENV_FILE="${RAG_LOCAL_ENV_FILE:-$PROJECT_ROOT/.env.local}"
 if [[ "$ENV_FILE" != /* ]]; then
   ENV_FILE="$PROJECT_ROOT/$ENV_FILE"
 fi
@@ -140,7 +140,9 @@ validate_env() {
     RAG_LOCAL_POSTGRES_PASSWORD RAG_LOCAL_POSTGRES_DB PROJECT_RAG_DATABASE_URL \
     DOCS_RAG_PG_LAB_DATABASE_URL RAG_MIGRATION_TARGET RAG_MIGRATION_WRITE_ACK \
     RAG_LOCAL_EMBEDDING_PROFILE PROJECT_RAG_PG_EMBEDDING_BASE_URL \
-    PROJECT_RAG_PG_EMBEDDING_MODEL PROJECT_RAG_PG_EMBEDDING_DIMENSIONS; do
+    PROJECT_RAG_PG_EMBEDDING_MODEL PROJECT_RAG_PG_EMBEDDING_DIMENSIONS \
+    PROJECT_RAG_PREPARE_RUNTIME PROJECT_RAG_DATABASE_START_COMMAND \
+    PROJECT_RAG_EMBEDDING_START_COMMAND; do
     required="${!key:-}"
     [[ -n "$required" ]] || die "$key is required in $ENV_FILE"
   done
@@ -175,6 +177,8 @@ validate_env() {
     die 'RAG_LOCAL_EMBEDDING_PROFILE must be 1024 or 4096'
   [[ "$PROJECT_RAG_PG_EMBEDDING_DIMENSIONS" == "$RAG_LOCAL_EMBEDDING_PROFILE" ]] || \
     die 'embedding dimensions do not match the selected local profile'
+  [[ "$PROJECT_RAG_PREPARE_RUNTIME" == "isolated_dev" ]] || \
+    die 'PROJECT_RAG_PREPARE_RUNTIME must be isolated_dev'
   [[ "$PROJECT_RAG_DATABASE_URL" == "postgres://${RAG_LOCAL_POSTGRES_USER}:${RAG_LOCAL_POSTGRES_PASSWORD}@127.0.0.1:${RAG_LOCAL_POSTGRES_PORT}/${RAG_LOCAL_POSTGRES_DB}" ]] || \
     die 'PROJECT_RAG_DATABASE_URL does not match the local database identity'
   [[ "$DOCS_RAG_PG_LAB_DATABASE_URL" == "$PROJECT_RAG_DATABASE_URL" ]] || \
@@ -251,11 +255,16 @@ init_env() {
     die "$ENV_FILE already exists; use --force only to replace this local file"
   fi
   need_command od
-  local password embedding_url embedding_model embedding_dimensions
+  local password embedding_url embedding_model embedding_dimensions embedding_start_command
   mapfile -t profile_values < <(embedding_profile_values "$profile")
   embedding_url="${profile_values[0]}"
   embedding_model="${profile_values[1]}"
   embedding_dimensions="${profile_values[2]}"
+  if [[ "$profile" == "1024" ]]; then
+    embedding_start_command='bun run embeddings:gpu:1024'
+  else
+    embedding_start_command='bun run embeddings:gpu'
+  fi
   password="$(od -An -N24 -tx1 /dev/urandom | tr -d '[:space:]')"
   [[ "$password" =~ ^[A-Za-z0-9_-]+$ ]] || die 'failed to generate a URL-safe local credential'
 
@@ -276,7 +285,10 @@ init_env() {
     printf 'PROJECT_RAG_PG_EMBEDDING_BASE_URL=%s\n' "$embedding_url"
     printf 'PROJECT_RAG_PG_EMBEDDING_MODEL=%s\n' "$embedding_model"
     printf 'PROJECT_RAG_PG_EMBEDDING_DIMENSIONS=%s\n' "$embedding_dimensions"
-    printf 'RAG_LOCAL_WORKER_EMBEDDING_BASE_URL=http://host.docker.internal:8082\n'
+    printf 'PROJECT_RAG_PREPARE_RUNTIME=isolated_dev\n'
+    printf 'PROJECT_RAG_DATABASE_START_COMMAND=bash scripts/rag-ops.sh up\n'
+    printf 'PROJECT_RAG_EMBEDDING_START_COMMAND=%s\n' "$embedding_start_command"
+    printf 'RAG_LOCAL_WORKER_EMBEDDING_BASE_URL=http://host.docker.internal:%s\n' "${embedding_url##*:}"
   } > "$env_tmp"; then
     rm -f -- "$env_tmp"
     die 'failed to write the local environment file'
@@ -337,6 +349,11 @@ do_down() {
 }
 
 do_status() {
+  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    return
+  fi
+  (($# == 0)) || die "status does not accept arguments"
   validate_env
   need_command docker
   assert_compose_namespace
@@ -345,6 +362,11 @@ do_status() {
 }
 
 do_doctor() {
+  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    return
+  fi
+  (($# == 0)) || die "doctor does not accept arguments"
   validate_env
   need_command docker
   docker info >/dev/null 2>&1 || die 'Docker daemon is not available'

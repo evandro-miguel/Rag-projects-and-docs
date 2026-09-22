@@ -3,8 +3,7 @@
  *
  * Preparation owns only the dependencies needed to index a Project RAG
  * corpus: the selected Project Postgres lane and the configured Project
- * embedding service.  It deliberately does not call the full `start-rag`
- * stack or start reranking services.
+ * embedding service. It deliberately does not start reranking services.
  */
 
 import { spawn } from 'node:child_process';
@@ -188,16 +187,6 @@ function knownOfficialDatabaseUrl(value: string | undefined): boolean {
   }
 }
 
-function knownOfficialEmbeddingUrl(value: string | undefined): boolean {
-  if (!value) return false;
-  try {
-    const parsed = new URL(value);
-    return ['127.0.0.1', 'localhost', '::1'].includes(parsed.hostname) && parsed.port === '8082';
-  } catch {
-    return false;
-  }
-}
-
 function databaseIsConfigured(env: NodeJS.ProcessEnv): boolean {
   return Boolean(
     normalize(
@@ -209,39 +198,8 @@ function databaseIsConfigured(env: NodeJS.ProcessEnv): boolean {
   );
 }
 
-function installedOfficialDatabaseStartCommand(
-  lane: ProjectRagPrepareRuntimeLane,
-  env: NodeJS.ProcessEnv
-): string | undefined {
-  const explicit = normalize(env.PROJECT_RAG_DATABASE_START_COMMAND);
-  if (explicit || lane !== 'official' || basename(IMPLEMENTATION_ROOT) !== 'rag-v2') {
-    return explicit;
-  }
-  const rawUrl = normalize(
-    env.PROJECT_RAG_DATABASE_URL ??
-      env.PROJECT_RAG_POSTGRES_URL ??
-      env.POSTGRES_URL ??
-      env.DATABASE_URL
-  );
-  if (!rawUrl) return undefined;
-  try {
-    const parsed = new URL(rawUrl);
-    const port = parsed.port || '5432';
-    const hostname = parsed.hostname;
-    const database = parsed.pathname.slice(1);
-    if (
-      ['127.0.0.1', 'localhost', '::1'].includes(hostname) &&
-      port === '5440' &&
-      database === 'rag_engine'
-    ) {
-      // The installed owner starts only its selected Postgres service.  It
-      // does not start embedding or reranking dependencies.
-      return `bash ${IMPLEMENTATION_ROOT}/scripts/start-rag.sh --docker-only --prod`;
-    }
-  } catch {
-    return undefined;
-  }
-  return undefined;
+function installedOfficialDatabaseStartCommand(env: NodeJS.ProcessEnv): string | undefined {
+  return normalize(env.PROJECT_RAG_DATABASE_START_COMMAND);
 }
 
 function redactedRuntimeEnv(
@@ -279,7 +237,7 @@ function resolveRuntimeConfiguration(env: NodeJS.ProcessEnv): RuntimeConfigurati
       env.LLAMACPP_START_COMMAND ??
       env.RAG_LLAMACPP_START_COMMAND
   );
-  const databaseStartCommand = installedOfficialDatabaseStartCommand(lane, env);
+  const databaseStartCommand = installedOfficialDatabaseStartCommand(env);
 
   if (lane === 'isolated_dev' || lane === 'test') {
     if (!databaseConfigured || !embeddingBaseUrl || !startCommand) {
@@ -307,10 +265,10 @@ function resolveRuntimeConfiguration(env: NodeJS.ProcessEnv): RuntimeConfigurati
         env.POSTGRES_URL ??
         env.DATABASE_URL
     );
-    if (knownOfficialEmbeddingUrl(embeddingBaseUrl) || knownOfficialDatabaseUrl(databaseUrl)) {
+    if (knownOfficialDatabaseUrl(databaseUrl)) {
       throw new ProjectRagPrepareRuntimeError(
         'RUNTIME_OWNERSHIP_CONFLICT',
-        'Isolated Project RAG preparation cannot target a known official embedding or database lane',
+        'Isolated Project RAG preparation cannot target a known official database lane',
         { lane }
       );
     }
@@ -453,7 +411,7 @@ async function ensureDatabaseAvailable(
     let child: ReturnType<typeof spawn>;
     try {
       child = spawn(startCommand, {
-        cwd: process.cwd(),
+        cwd: IMPLEMENTATION_ROOT,
         detached: true,
         shell: true,
         stdio: 'ignore',
