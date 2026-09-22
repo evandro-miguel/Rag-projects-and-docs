@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify:
     name: Lint, typecheck, and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       BUN_CONFIG_DOTENV_DISABLE: "1"

@@ -103,7 +103,7 @@ describe('docs rag pg lab config', () => {
          const result = await runDocsRagChildProcess(
            ['bash', '-lc', 'trap "exit 0" TERM; (trap "" TERM; sleep 30) >/dev/null 2>&1 & echo $!; wait'],
            process.cwd(),
-           { timeoutMs: 100, outputTailBytes: 4096 }
+           { timeoutMs: 1_000, outputTailBytes: 4096 }
          );
          const descendantPid = Number.parseInt(result.stdout.text.trim(), 10);
          await Bun.sleep(5_500);
