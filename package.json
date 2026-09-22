@@ -8,11 +8,11 @@
   "packageManager": "bun@1.3.14",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/evandro-miguel/rag-v2.git"
+    "url": "git+https://github.com/evandro-miguel/Rag-projects-and-docs.git"
   },
-  "homepage": "https://github.com/evandro-miguel/rag-v2#readme",
+  "homepage": "https://github.com/evandro-miguel/Rag-projects-and-docs#readme",
   "bugs": {
-    "url": "https://github.com/evandro-miguel/rag-v2/issues"
+    "url": "https://github.com/evandro-miguel/Rag-projects-and-docs/issues"
   },
   "bin": {
     "ragctl": "./bin/ragctl"

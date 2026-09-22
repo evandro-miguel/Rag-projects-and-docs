@@ -1,6 +1,6 @@
-# RAG-v2
+# RAG Projects and Docs
 
-RAG-v2 is a public, self-hosted alpha for retrieving external technical
+RAG Projects and Docs is a public, self-hosted alpha for retrieving external technical
 documentation and repository code through Postgres, local embeddings, a short-
 lived CLI, and MCP. It is intended for local evaluation; hosted-service and
 production-readiness claims are outside this alpha.
@@ -17,8 +17,8 @@ The npm package remains private and is not published.
 ## Clone and start
 
 ```bash
-git clone https://github.com/evandro-miguel/rag-v2.git
-cd rag-v2
+git clone https://github.com/evandro-miguel/Rag-projects-and-docs.git
+cd Rag-projects-and-docs
 bun install --frozen-lockfile
 bash scripts/rag-ops.sh init
 ```

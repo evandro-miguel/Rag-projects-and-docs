@@ -1,7 +1,7 @@
 # Security policy
 
-RAG-v2 is a public, self-hosted alpha intended for local evaluation. The
-supported boundary is the documented local setup; hosted, multi-tenant,
+RAG Projects and Docs is a public, self-hosted alpha intended for local
+evaluation. The supported boundary is the documented local setup; hosted, multi-tenant,
 public-network, and production deployments are not validated by this project.
 
 ## Safe operation
@@ -15,7 +15,7 @@ public-network, and production deployments are not validated by this project.
 ## Reporting a vulnerability
 
 Report security issues through the repository's
-[private GitHub security advisory form](https://github.com/evandro-miguel/rag-v2/security/advisories/new)
+[private GitHub security advisory form](https://github.com/evandro-miguel/Rag-projects-and-docs/security/advisories/new)
 rather than a public issue. Include the affected version or commit, impact,
 preconditions, and a minimal reproduction. Do not include tokens, passwords,
 connection strings, private keys, database dumps, or unredacted indexed data.
