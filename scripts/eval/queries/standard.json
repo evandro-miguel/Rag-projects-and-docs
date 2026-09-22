@@ -1,0 +1,110 @@
+[
+  {
+    "id": "bun-001",
+    "query": "Bun.serve HTTP server routes fetch Response",
+    "expectedAnswer": "Use Bun.serve with route handlers or a fetch handler to return Response objects.",
+    "expectedKeywords": ["Bun.serve", "routes", "fetch", "Response"],
+    "expectedDocPaths": ["bun-docs/runtime/http/server.mdx"],
+    "category": "bun",
+    "difficulty": "easy"
+  },
+  {
+    "id": "bun-002",
+    "query": "Bun shell command run JavaScript",
+    "expectedAnswer": "Use Bun's shell API to run shell commands from JavaScript or TypeScript.",
+    "expectedKeywords": ["shell", "Bun", "command"],
+    "expectedDocPaths": ["bun-docs/runtime/shell.mdx"],
+    "category": "bun",
+    "difficulty": "easy"
+  },
+  {
+    "id": "bun-003",
+    "query": "Bun workspaces package manager",
+    "expectedAnswer": "Bun supports workspaces for managing multiple packages from a single repository.",
+    "expectedKeywords": ["workspaces", "packages", "bun"],
+    "expectedDocPaths": ["bun-docs/pm/workspaces.mdx"],
+    "category": "bun",
+    "difficulty": "medium"
+  },
+  {
+    "id": "react-001",
+    "query": "React useEffect synchronize component with external system",
+    "expectedAnswer": "Use useEffect to synchronize a component with an external system after render.",
+    "expectedKeywords": ["useEffect", "synchronize", "external system"],
+    "expectedDocPaths": ["react-docs/reference/react/useEffect.md"],
+    "category": "react",
+    "difficulty": "easy"
+  },
+  {
+    "id": "react-002",
+    "query": "React useMemo cache expensive calculation",
+    "expectedAnswer": "Use useMemo to cache the result of an expensive calculation between renders.",
+    "expectedKeywords": ["useMemo", "cache", "calculation"],
+    "expectedDocPaths": ["react-docs/reference/react/useMemo.md"],
+    "category": "react",
+    "difficulty": "easy"
+  },
+  {
+    "id": "typescript-001",
+    "query": "TypeScript narrowing discriminated unions",
+    "expectedAnswer": "Use control-flow narrowing and discriminant properties to narrow union members.",
+    "expectedKeywords": ["narrowing", "union", "discriminated"],
+    "expectedDocPaths": ["typescript-docs/handbook-v2/Narrowing.md"],
+    "category": "typescript",
+    "difficulty": "medium"
+  },
+  {
+    "id": "typescript-002",
+    "query": "TypeScript utility types Partial Pick Omit",
+    "expectedAnswer": "TypeScript provides utility types such as Partial, Pick, and Omit for transforming types.",
+    "expectedKeywords": ["Partial", "Pick", "Omit"],
+    "expectedDocPaths": ["typescript-docs/reference/Utility Types.md"],
+    "category": "typescript",
+    "difficulty": "easy"
+  },
+  {
+    "id": "fastapi-001",
+    "query": "FastAPI path operation query parameters",
+    "expectedAnswer": "FastAPI reads path and query parameters from function parameters in path operations.",
+    "expectedKeywords": ["path operation", "query parameters", "FastAPI"],
+    "expectedDocPaths": ["fastapi-docs/tutorial/query-params.md"],
+    "category": "fastapi",
+    "difficulty": "easy"
+  },
+  {
+    "id": "fastapi-002",
+    "query": "FastAPI dependency injection Depends",
+    "expectedAnswer": "Use Depends to declare dependencies that FastAPI resolves for path operation functions.",
+    "expectedKeywords": ["Depends", "dependency", "FastAPI"],
+    "expectedDocPaths": ["fastapi-docs/tutorial/dependencies/index.md"],
+    "category": "fastapi",
+    "difficulty": "medium"
+  },
+  {
+    "id": "go-001",
+    "query": "Go acceptance tests scaling testing",
+    "expectedAnswer": "Use Go tests to describe behavior and scale acceptance tests around observable outcomes.",
+    "expectedKeywords": ["acceptance", "tests", "Go"],
+    "expectedDocPaths": ["go-books/scaling-acceptance-tests.md"],
+    "category": "go",
+    "difficulty": "easy"
+  },
+  {
+    "id": "docker-001",
+    "query": "Docker Compose services volumes environment variables",
+    "expectedAnswer": "Compose files define services, volumes, and environment variables for multi-container apps.",
+    "expectedKeywords": ["services", "volumes", "environment"],
+    "expectedDocPaths": ["docker-docs/reference/compose-file/services.md"],
+    "category": "docker",
+    "difficulty": "medium"
+  },
+  {
+    "id": "zod-001",
+    "query": "Zod object schema parse safeParse",
+    "expectedAnswer": "Use z.object schemas with parse or safeParse to validate structured input.",
+    "expectedKeywords": ["object", "parse", "safeParse"],
+    "expectedDocPaths": ["zod-docs/basics.mdx"],
+    "category": "zod",
+    "difficulty": "easy"
+  }
+]

@@ -1,0 +1,108 @@
+# Docker-first, worktree-local RAG operations stack.
+#
+# This file intentionally has no credential defaults. `scripts/rag-ops.sh init`
+# creates the ignored .env.rag.local file and chooses a disposable database
+# identity accepted by the migration runner.
+
+name: ${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}
+
+x-json-log-rotation: &json-log-rotation
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: ${RAG_LOCAL_POSTGRES_IMAGE:-pgvector/pgvector:pg16}
+    container_name: ${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}-postgres
+    ports:
+      - "127.0.0.1:${RAG_LOCAL_POSTGRES_PORT:-5560}:5432"
+    environment:
+      POSTGRES_USER: ${RAG_LOCAL_POSTGRES_USER:?RAG_LOCAL_POSTGRES_USER is required; run scripts/rag-ops.sh init}
+      POSTGRES_PASSWORD: ${RAG_LOCAL_POSTGRES_PASSWORD:?RAG_LOCAL_POSTGRES_PASSWORD is required; run scripts/rag-ops.sh init}
+      POSTGRES_DB: ${RAG_LOCAL_POSTGRES_DB:-rag_v2_migration_local}
+    volumes:
+      - rag-local-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    logging: *json-log-rotation
+    restart: unless-stopped
+
+  # Optional durable Project RAG worker. It is never part of the default
+  # install; invoke `rag-ops up --profile worker` deliberately.
+  worker:
+    image: ${RAG_LOCAL_WORKER_IMAGE:-oven/bun:1.3.14}
+    profiles: [worker]
+    working_dir: /workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ../..:/workspace:ro
+      - rag-local-node-modules:/workspace/node_modules
+    environment:
+      PROJECT_RAG_DATABASE_URL: postgres://${RAG_LOCAL_POSTGRES_USER:?RAG_LOCAL_POSTGRES_USER is required}:${RAG_LOCAL_POSTGRES_PASSWORD:?RAG_LOCAL_POSTGRES_PASSWORD is required}@postgres:5432/${RAG_LOCAL_POSTGRES_DB:-rag_v2_migration_local}
+      PROJECT_RAG_PG_EMBEDDING_BASE_URL: ${RAG_LOCAL_WORKER_EMBEDDING_BASE_URL:-http://host.docker.internal:8082}
+      PROJECT_RAG_PG_EMBEDDING_MODEL: ${RAG_LOCAL_EMBEDDING_MODEL:-qwen3-embedding-1024}
+      PROJECT_RAG_PG_EMBEDDING_TIMEOUT_MS: ${RAG_LOCAL_EMBEDDING_TIMEOUT_MS:-60000}
+      RAG_PROJECT_WATCHER_ENABLED: "false"
+      PROJECT_RAG_WORKER_ID: ${RAG_LOCAL_WORKER_ID:-docker-worker}
+      BUN_CONFIG_DOTENV_DISABLE: "1"
+    command:
+      - sh
+      - -c
+      - bun install --frozen-lockfile && exec bun run project-rag:worker
+    restart: unless-stopped
+    logging: *json-log-rotation
+
+  # The reranker remains optional so a clean database install does not pull a
+  # model before the operator asks for it.
+  reranker:
+    profiles: [reranker]
+    build:
+      context: ../..
+      dockerfile: infra/docker/reranker/Dockerfile
+    container_name: ${RAG_LOCAL_COMPOSE_PROJECT:-rag-v2-local}-reranker
+    ports:
+      - "127.0.0.1:${RAG_LOCAL_RERANKER_PORT:-3560}:3456"
+    working_dir: /app
+    user: "bun"
+    volumes:
+      - ../..:/app:ro
+      - /app/node_modules
+      - rag-local-reranker-cache:/home/reranker/.cache
+      - rag-local-reranker-models:/home/reranker/.cache/huggingface
+    environment:
+      HOME: /home/reranker
+      HF_HOME: /home/reranker/.cache/huggingface
+      XDG_CACHE_HOME: /home/reranker/.cache
+      RERANKING_SERVICE_PORT: "3456"
+      RERANKING_SERVICE_HOST: "0.0.0.0"
+      RERANKING_MODEL: ${RAG_LOCAL_RERANKING_MODEL:-Xenova/ms-marco-MiniLM-L-6-v2}
+      RERANKING_QUANTIZED: ${RAG_LOCAL_RERANKING_QUANTIZED:-true}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          bun -e "fetch('http://localhost:3456/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    restart: unless-stopped
+    logging: *json-log-rotation
+
+volumes:
+  rag-local-postgres-data:
+  rag-local-node-modules:
+  rag-local-reranker-cache:
+  rag-local-reranker-models:

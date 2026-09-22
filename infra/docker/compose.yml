@@ -1,0 +1,82 @@
+name: rag-v2
+
+x-json-log-rotation: &json-log-rotation
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # PostgreSQL com pgvector
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-v2-postgres
+    ports:
+      - "127.0.0.1:5440:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required; use a non-default secret}
+      POSTGRES_DB: rag_engine
+    volumes:
+      - rag-v2-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging: *json-log-rotation
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Reranking Service
+  reranker:
+    build:
+      context: ../../
+      dockerfile: infra/docker/reranker/Dockerfile
+    container_name: rag-v2-reranker
+    ports:
+      - "127.0.0.1:3456:3456"
+    working_dir: /app
+    user: "bun"
+    volumes:
+      - ../../:/app:ro
+      - /app/node_modules
+      - rag-v2-reranker-cache:/home/reranker/.cache
+      - rag-v2-reranker-models:/home/reranker/.cache/huggingface
+    environment:
+      - HOME=/home/reranker
+      - HF_HOME=/home/reranker/.cache/huggingface
+      - XDG_CACHE_HOME=/home/reranker/.cache
+      - RERANKING_SERVICE_PORT=3456
+      - RERANKING_SERVICE_HOST=0.0.0.0
+      - RERANKING_MODEL=${RERANKING_MODEL:-Xenova/ms-marco-MiniLM-L-6-v2}
+      - RERANKING_QUANTIZED=${RERANKING_QUANTIZED:-true}
+    healthcheck:
+      test: ["CMD-SHELL", "bun -e \"fetch('http://localhost:3456/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    logging: *json-log-rotation
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+volumes:
+  rag-v2-postgres-data:
+  rag-v2-reranker-cache:
+  rag-v2-reranker-models:

@@ -1,0 +1,38 @@
+# Docker Compose for the isolated Postgres development environment
+# Usage: docker-compose -f infra/docker/compose.dev.yml up -d
+#
+# This creates a separate Postgres instance for development/testing.
+# Override COMPOSE_PROJECT_NAME and RAG_DEV_*_PORT for worktree isolation.
+
+name: ${COMPOSE_PROJECT_NAME:-rag-v2-dev}
+
+services:
+  # PostgreSQL for Dev (separate from production)
+  postgres-dev:
+    image: pgvector/pgvector:pg16
+    container_name: ${COMPOSE_PROJECT_NAME:-rag-v2-dev}-postgres-dev
+    ports:
+      - "127.0.0.1:${RAG_DEV_POSTGRES_PORT:-5441}:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required. Set it in .env.dev.local}
+      POSTGRES_DB: ${RAG_DEV_POSTGRES_DB:-rag_dev}
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  postgres-dev-data:

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "embedding-config",
+    "query": "resolveProjectRagPostgresEmbeddingConfig provider model dimensions",
+    "expectedPaths": [
+      "scripts/project-rag/embeddings.ts",
+      "scripts/project-rag/config.ts"
+    ]
+  },
+  {
+    "name": "postgres-search",
+    "query": "searchProjectRagPostgresChunks lexical vector fusion",
+    "expectedPaths": [
+      "scripts/project-rag/store.ts",
+      "scripts/project-rag/application-service.ts"
+    ]
+  },
+  {
+    "name": "mcp-project-search",
+    "query": "handleSearchProjectCode executeSearch withReadDeadline",
+    "expectedPaths": [
+      "mcp/project-handlers.ts",
+      "scripts/project-rag/application-service.ts"
+    ]
+  }
+]

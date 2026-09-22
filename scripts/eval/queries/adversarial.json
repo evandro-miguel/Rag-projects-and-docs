@@ -1,0 +1,52 @@
+[
+  {
+    "id": "adv-001",
+    "query": "Bun.serve routs fetch Responce",
+    "expectedAnswer": "Search should tolerate typos and still retrieve Bun server routing documentation.",
+    "expectedKeywords": ["Bun.serve", "routes", "Response"],
+    "expectedDocPaths": ["bun-docs/runtime/http/server.mdx"],
+    "category": "adversarial",
+    "difficulty": "easy",
+    "type": "typo"
+  },
+  {
+    "id": "adv-002",
+    "query": "React effect cleanup external subscription",
+    "expectedAnswer": "Search should find React effect cleanup guidance for external subscriptions.",
+    "expectedKeywords": ["effect", "cleanup", "subscription"],
+    "expectedDocPaths": ["react-docs/reference/react/useEffect.md"],
+    "category": "adversarial",
+    "difficulty": "medium",
+    "type": "paraphrase"
+  },
+  {
+    "id": "adv-003",
+    "query": "como autenticar no Django",
+    "expectedAnswer": "Out-of-scope technology, low score expected.",
+    "expectedKeywords": [],
+    "expectedDocPaths": ["__should_not_match__"],
+    "category": "adversarial",
+    "difficulty": "hard",
+    "type": "out-of-scope"
+  },
+  {
+    "id": "adv-004",
+    "query": "Laravel OAuth middleware",
+    "expectedAnswer": "Out-of-scope technology, low score expected.",
+    "expectedKeywords": [],
+    "expectedDocPaths": ["__should_not_match__"],
+    "category": "adversarial",
+    "difficulty": "hard",
+    "type": "out-of-scope"
+  },
+  {
+    "id": "adv-005",
+    "query": "typescript union exact shape property switch",
+    "expectedAnswer": "Search should retrieve TypeScript narrowing or union documentation.",
+    "expectedKeywords": ["narrowing", "union"],
+    "expectedDocPaths": ["typescript-docs/handbook-v2/Narrowing.md"],
+    "category": "adversarial",
+    "difficulty": "medium",
+    "type": "paraphrase"
+  }
+]

@@ -1,0 +1,9 @@
+#!/usr/bin/env bun
+import { runRagctl } from '../scripts/ragctl.ts';
+
+const result = await runRagctl(process.argv.slice(2));
+if (result.stderr) {
+  process.stderr.write(result.stderr);
+}
+process.stdout.write(result.stdout);
+process.exit(result.exitCode);

@@ -1,0 +1,50 @@
+name: ${COMPOSE_PROJECT_NAME:-rag-v2-docs-rag}
+
+x-json-log-rotation: &json-log-rotation
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # Docs-only Postgres lab with pgvector and isolated storage.
+  postgres:
+    image: ${DOCS_RAG_PGVECTOR_IMAGE:-pgvector/pgvector:0.8.3-pg18}
+    container_name: ${COMPOSE_PROJECT_NAME:-rag-v2-docs-rag}-postgres
+    ports:
+      - "127.0.0.1:${DOCS_RAG_POSTGRES_PORT:-5542}:5432"
+    environment:
+      POSTGRES_USER: ${DOCS_RAG_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${DOCS_RAG_POSTGRES_PASSWORD:?DOCS_RAG_POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${DOCS_RAG_POSTGRES_DB:-docs_rag_lab}
+    volumes:
+      - docs-rag-postgres-data:/var/lib/postgresql
+    networks:
+      - docs-rag-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DOCS_RAG_POSTGRES_USER:-postgres} -d ${DOCS_RAG_POSTGRES_DB:-docs_rag_lab}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging: *json-log-rotation
+    restart: unless-stopped
+    cpus: "${DOCS_RAG_POSTGRES_CPUS:-1.0}"
+    mem_limit: ${DOCS_RAG_POSTGRES_MEMORY_LIMIT:-1g}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: ${DOCS_RAG_POSTGRES_MEMORY_LIMIT:-1g}
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+volumes:
+  docs-rag-postgres-data:
+    name: ${COMPOSE_PROJECT_NAME:-rag-v2-docs-rag}-postgres-data
+
+networks:
+  docs-rag-net:
+    name: ${COMPOSE_PROJECT_NAME:-rag-v2-docs-rag}-net
+    driver: bridge

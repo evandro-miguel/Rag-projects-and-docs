@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "name": "docs-rag-pg-lab-sample",
+    "description": "Offline-safe retrieval fixture for the isolated Docs RAG Postgres lab."
+  },
+  "cases": [
+    {
+      "id": "postgres-vector-runtime-policy",
+      "query": "postgres vector dimension invariant embedding lane",
+      "expectedPaths": ["docs/internal/RUNTIME_POLICY.md"],
+      "expectedCitationPath": "docs/internal/RUNTIME_POLICY.md",
+      "retrieved": [
+        {
+          "path": "docs/internal/RUNTIME_POLICY.md",
+          "score": 0.94
+        },
+        {
+          "path": "docs/guides/using-docs-rag.md",
+          "score": 0.52
+        }
+      ]
+    },
+    {
+      "id": "docs-rag-live-gate",
+      "query": "docs rag live verification expected source path",
+      "expectedPaths": ["README.md"],
+      "expectedCitationPath": "README.md",
+      "retrieved": [
+        {
+          "path": "docs/README.md",
+          "score": 0.73
+        },
+        {
+          "path": "README.md",
+          "score": 0.68
+        }
+      ]
+    }
+  ]
+}

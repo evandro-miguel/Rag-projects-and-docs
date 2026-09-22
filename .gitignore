@@ -1,0 +1,41 @@
+node_modules/
+dist/
+coverage/
+.coverage/
+*.log
+*.tgz
+.DS_Store
+
+# Local configuration and secrets
+.env
+.env.*
+/.env.*.local
+!.env.example
+!.env.*.example
+
+# Generated and runtime state
+.data/
+.tmp/
+tmp/
+.worktree/
+.gitnexus/
+.grepai/
+.rumdl_cache/
+
+# Downloaded and processed external corpora
+ingest/source/external/
+ingest/processed/external/
+
+# Generated symbol indexes
+*.symbols.json
+ctags-*.json
+convex-symbols.json
+convex-production-symbols.json
+symbol-index.json
+symbols-summary.json
+project-symbol-index.json
+
+# Test fixtures intentionally contain fake ignored inputs
+!scripts/eval/project-rag/repos/fixture-secret-noise/.env
+!scripts/eval/project-rag/repos/fixture-secret-noise/dist/
+!scripts/eval/project-rag/repos/fixture-secret-noise/dist/app.min.js

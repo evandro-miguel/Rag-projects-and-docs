@@ -1,0 +1,274 @@
+{
+  "meta": {
+    "name": "docs-rag-pg-lab-external-sources",
+    "description": "Live retrieval fixture for official external Docs RAG sources indexed in Postgres."
+  },
+  "cases": [
+    {
+      "id": "unscoped-react-useeffect-sync",
+      "query": "synchronize a component with an external system using useEffect",
+      "expectedPaths": ["ingest/processed/external/react-docs/reference/react/useEffect.md"],
+      "expectedCitationPath": "ingest/processed/external/react-docs/reference/react/useEffect.md",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/react-docs/reference/react/useEffect.md",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "unscoped-react-useformstatus",
+      "query": "React useFormStatus pending form submission status",
+      "expectedPaths": [
+        "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md"
+      ],
+      "expectedCitationPath": "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "react-useeffect-sync",
+      "sourceId": "react-docs",
+      "query": "react useEffect synchronize component with external system",
+      "expectedPaths": ["ingest/processed/external/react-docs/reference/react/useEffect.md"],
+      "expectedCitationPath": "ingest/processed/external/react-docs/reference/react/useEffect.md",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/react-docs/reference/react/useEffect.md",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "react-useformstatus",
+      "sourceId": "react-docs",
+      "query": "React useFormStatus pending form submission status",
+      "expectedPaths": [
+        "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md"
+      ],
+      "expectedCitationPath": "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/react-docs/reference/react-dom/hooks/useFormStatus.md",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "bun-readable-streams",
+      "sourceId": "bun-docs",
+      "query": "ReadableStream controller flush direct streams",
+      "expectedPaths": ["ingest/processed/external/bun-docs/runtime/streams.mdx"],
+      "expectedCitationPath": "ingest/processed/external/bun-docs/runtime/streams.mdx",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/bun-docs/runtime/streams.mdx",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "python-import-c-api",
+      "sourceId": "python-docs",
+      "query": "PyImport_AppendInittab PyImport_ExtendInittab",
+      "expectedPaths": ["ingest/processed/external/python-docs/c-api/import.rst"],
+      "expectedCitationPath": "ingest/processed/external/python-docs/c-api/import.rst",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/python-docs/c-api/import.rst",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "typescript-conditional-types",
+      "sourceId": "typescript-docs",
+      "query": "typescript conditional types infer extends distributive",
+      "expectedPaths": [
+        "ingest/processed/external/typescript-docs/release-notes/TypeScript 2.8.md"
+      ],
+      "expectedCitationPath": "ingest/processed/external/typescript-docs/release-notes/TypeScript 2.8.md",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/typescript-docs/release-notes/TypeScript 2.8.md",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "zod-safe-parse",
+      "sourceId": "zod-docs",
+      "query": "zod safeParse schema object parse error",
+      "expectedPaths": ["ingest/processed/external/zod-docs/basics.mdx"],
+      "expectedCitationPath": "ingest/processed/external/zod-docs/basics.mdx",
+      "retrieved": [
+        {
+          "path": "ingest/processed/external/zod-docs/basics.mdx",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "tailwind-directives",
+      "sourceId": "components",
+      "query": "Tailwind theme source directive",
+      "expectedPaths": ["ingest/processed/external/components/functions-and-directives.mdx"],
+      "expectedCitationPath": "ingest/processed/external/components/functions-and-directives.mdx",
+      "retrieved": []
+    },
+    {
+      "id": "tanstack-file-route",
+      "sourceId": "tanstack",
+      "query": "createFileRoute routeTree file based routing",
+      "expectedPaths": ["ingest/processed/external/tanstack/api/router/createFileRouteFunction.md"],
+      "expectedCitationPath": "ingest/processed/external/tanstack/api/router/createFileRouteFunction.md",
+      "retrieved": []
+    },
+    {
+      "id": "uv-lock-sync",
+      "sourceId": "uv-docs",
+      "query": "uv lock sync dependency resolution",
+      "expectedPaths": ["ingest/processed/external/uv-docs/concepts/resolution.md"],
+      "expectedCitationPath": "ingest/processed/external/uv-docs/concepts/resolution.md",
+      "retrieved": []
+    },
+    {
+      "id": "fastapi-dependencies",
+      "sourceId": "fastapi-docs",
+      "query": "FastAPI dependency injection Depends",
+      "expectedPaths": ["ingest/processed/external/fastapi-docs/tutorial/dependencies/index.md"],
+      "expectedCitationPath": "ingest/processed/external/fastapi-docs/tutorial/dependencies/index.md",
+      "retrieved": []
+    },
+    {
+      "id": "zustand-create-store",
+      "sourceId": "zustand-docs",
+      "query": "Zustand create store set get",
+      "expectedPaths": ["ingest/processed/external/zustand-docs/reference/apis/create-store.md"],
+      "expectedCitationPath": "ingest/processed/external/zustand-docs/reference/apis/create-store.md",
+      "retrieved": []
+    },
+    {
+      "id": "react-router-data-route",
+      "sourceId": "react-router-docs",
+      "query": "React Router dataStrategy custom loader action execution",
+      "expectedPaths": ["ingest/processed/external/react-router-docs/how-to/data-strategy.md"],
+      "expectedCitationPath": "ingest/processed/external/react-router-docs/how-to/data-strategy.md",
+      "retrieved": []
+    },
+    {
+      "id": "docker-compose-startup",
+      "sourceId": "docker-docs",
+      "query": "Docker Compose depends_on healthcheck service_healthy",
+      "expectedPaths": [
+        "ingest/processed/external/docker-docs/manuals/compose/how-tos/startup-order.md"
+      ],
+      "expectedCitationPath": "ingest/processed/external/docker-docs/manuals/compose/how-tos/startup-order.md",
+      "retrieved": []
+    },
+    {
+      "id": "go-sql-transaction",
+      "sourceId": "go-docs",
+      "query": "Go database transaction sql.Tx Commit Rollback BeginTx",
+      "expectedPaths": ["ingest/processed/external/go-docs/database/execute-transactions.md"],
+      "expectedCitationPath": "ingest/processed/external/go-docs/database/execute-transactions.md",
+      "retrieved": []
+    },
+    {
+      "id": "go-book-concurrency",
+      "sourceId": "go-books",
+      "query": "Go concurrency goroutine channel select",
+      "expectedPaths": ["ingest/processed/external/go-books/select.md"],
+      "expectedCitationPath": "ingest/processed/external/go-books/select.md",
+      "retrieved": []
+    },
+    {
+      "id": "pgvector-hnsw-halfvec",
+      "sourceId": "pgvector-docs",
+      "query": "CREATE INDEX USING hnsw halfvec vector_cosine_ops",
+      "expectedPaths": ["ingest/processed/external/pgvector-docs/README.md"],
+      "expectedCitationPath": "ingest/processed/external/pgvector-docs/README.md",
+      "retrieved": []
+    },
+    {
+      "id": "mcp-tools-list",
+      "sourceId": "mcp-docs",
+      "query": "tools/list method JSON-RPC MCP server tools",
+      "expectedPaths": [
+        "ingest/processed/external/mcp-docs/specification/2026-07-28/server/tools.mdx"
+      ],
+      "expectedCitationPath": "ingest/processed/external/mcp-docs/specification/2026-07-28/server/tools.mdx",
+      "retrieved": []
+    },
+    {
+      "id": "vitest-exclude-config",
+      "sourceId": "vitest-docs",
+      "query": "vitest exclude test.exclude glob config",
+      "expectedPaths": ["ingest/processed/external/vitest-docs/config/exclude.md"],
+      "expectedCitationPath": "ingest/processed/external/vitest-docs/config/exclude.md",
+      "retrieved": []
+    },
+    {
+      "id": "biome-json-config",
+      "sourceId": "biome-docs",
+      "query": "configure biome.json configuration file formatter linter",
+      "expectedPaths": ["ingest/processed/external/biome-docs/guides/configure-biome.mdx"],
+      "expectedCitationPath": "ingest/processed/external/biome-docs/guides/configure-biome.mdx",
+      "retrieved": []
+    },
+    {
+      "id": "tanstack-query-usequery",
+      "sourceId": "tanstack-query-docs",
+      "query": "useQuery staleTime gcTime queryKey queryFn",
+      "expectedPaths": ["ingest/processed/external/tanstack-query-docs/reference/useQuery.md"],
+      "expectedCitationPath": "ingest/processed/external/tanstack-query-docs/reference/useQuery.md",
+      "retrieved": []
+    },
+    {
+      "id": "playwright-locators",
+      "sourceId": "playwright-docs",
+      "query": "locator getByRole click auto waiting",
+      "expectedPaths": ["ingest/processed/external/playwright-docs/api/class-locator.mdx"],
+      "expectedCitationPath": "ingest/processed/external/playwright-docs/api/class-locator.mdx",
+      "retrieved": []
+    },
+    {
+      "id": "vite-server-port",
+      "sourceId": "vite-docs",
+      "query": "vite.config server.port allowedHosts",
+      "expectedPaths": ["ingest/processed/external/vite-docs/config/server-options.md"],
+      "expectedCitationPath": "ingest/processed/external/vite-docs/config/server-options.md",
+      "retrieved": []
+    },
+    {
+      "id": "hono-middleware-context",
+      "sourceId": "hono-docs",
+      "query": "hono middleware Context next c.set c.get",
+      "expectedPaths": ["ingest/processed/external/hono-docs/api/context.md"],
+      "expectedCitationPath": "ingest/processed/external/hono-docs/api/context.md",
+      "retrieved": []
+    },
+    {
+      "id": "pydantic-model-validator",
+      "sourceId": "pydantic-docs",
+      "query": "model_validator field_validator model_config extra forbid",
+      "expectedPaths": ["ingest/processed/external/pydantic-docs/validators.md"],
+      "expectedCitationPath": "ingest/processed/external/pydantic-docs/validators.md",
+      "retrieved": []
+    },
+    {
+      "id": "supabase-rls-policy",
+      "sourceId": "supabase-database-docs",
+      "query": "row level security policy auth.uid()",
+      "expectedPaths": [
+        "ingest/processed/external/supabase-database-docs/postgres/row-level-security.mdx"
+      ],
+      "expectedCitationPath": "ingest/processed/external/supabase-database-docs/postgres/row-level-security.mdx",
+      "retrieved": []
+    }
+  ]
+}
